@@ -1,0 +1,17 @@
+{
+  "name": "discord-forum-bot-sql",
+  "version": "1.0.0",
+  "description": "Discord Forum Bot with SQL Database",
+  "main": "OG.js",
+  "scripts": {
+    "start": "node OG.js",
+    "migrate": "node migrate_data.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.20.0",
+    "puppeteer": "^21.11.0",
+    "sqlite3": "^5.1.7",
+    "telegraf": "^4.16.3",
+    "uuid": "^9.0.1"
+  }
+}
