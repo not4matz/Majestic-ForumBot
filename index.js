@@ -18,6 +18,15 @@ const path = require('path');
 const Database = require('./database'); // Add database import
 const CommandHandler = require('./commands'); // Add command handler import
 
+// Load configuration
+const configPath = path.join(__dirname, 'config.json');
+let config = {};
+try {
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+} catch (err) {
+    console.warn('⚠️ config.json not found. Run `npm run setup` to create it.');
+}
+
 // Initialize database
 const db = new Database();
 let dbInitialized = false;
@@ -45,19 +54,13 @@ let telegramBot = null;
 let userMappings = {};
 const USER_MAPPINGS_FILE = path.join(__dirname, 'telegram_user_mappings.json');
 const PENDING_REQUESTS_FILE = path.join(__dirname, 'pending_requests.json');
-const ADMIN_NOTIFICATION_CHANNEL_ID = '1385561623103537163'; // << IMPORTANT: Configure this
+const ADMIN_NOTIFICATION_CHANNEL_ID = config.adminNotificationChannelId || null; // Configurable
 
 setInterval(saveStats, 60000); // Save stats every minute
 
 // === Helper: Token & IDs ===
-function getTokenFromFile() {
-    try {
-        const token = fs.readFileSync('token.txt', 'utf8').trim();
-        return token;
-    } catch (err) {
-        console.error("❌ Fehler beim Token-Laden:", err);
-        return null;
-    }
+function getDiscordToken() {
+    return config.discordToken || null;
 }
 
 async function getIDsFromFile(type) {
@@ -175,7 +178,7 @@ const client = new Client({
     ]
 });
 
-const NOTIFICATION_CHANNEL_ID = '1382139125951627264';
+const NOTIFICATION_CHANNEL_ID = config.notificationChannelId || null;
 
 // === Logging ===
 async function logToConsole(message) { // Renamed and simplified
@@ -1348,15 +1351,9 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Load Telegram bot token from file
-function getTelegramTokenFromFile() {
-    try {
-        const token = fs.readFileSync(path.join(__dirname, 'telegram_token.txt'), 'utf8').trim();
-        return token;
-    } catch (err) {
-        console.error("❌ Fehler beim Telegram-Token-Laden:", err);
-        return null;
-    }
+// Load Telegram bot token from config
+function getTelegramToken() {
+    return config.telegramToken || null;
 }
 
 // Load saved user mappings
@@ -1389,9 +1386,9 @@ async function saveUserMappings() {
 
 // Initialize Telegram bot
 async function initTelegramBot() {
-    const token = getTelegramTokenFromFile();
+    const token = getTelegramToken();
     if (!token) {
-        console.log("⚠️ No Telegram token found. Telegram notifications will be disabled.");
+        console.log("⚠️ No Telegram token configured. Telegram notifications will be disabled.");
         return false;
     }
     
@@ -1496,7 +1493,7 @@ async function main() {
     // Wait for database initialization
     await initializeDatabase();
     
-    const token = getTokenFromFile();
+    const token = getDiscordToken();
     if (token) {
         await loadStats();
         client.login(token).catch(err => {

@@ -1,5 +1,16 @@
 const { PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } = require('discord.js');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const path = require('path');
+
+// Load configuration
+const configPath = path.join(__dirname, 'config.json');
+let config = {};
+try {
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+} catch (err) {
+    console.warn('⚠️ config.json not found. Run `npm run setup` to create it.');
+}
 
 class CommandHandler {
     constructor(db, client, getIDsFromFile, sendIDListToChannel, loadPendingRequests, savePendingRequests) {
@@ -9,7 +20,7 @@ class CommandHandler {
         this.sendIDListToChannel = sendIDListToChannel;
         this.loadPendingRequests = loadPendingRequests;
         this.savePendingRequests = savePendingRequests;
-        this.ADMIN_NOTIFICATION_CHANNEL_ID = '1385561623103537163';
+        this.ADMIN_NOTIFICATION_CHANNEL_ID = config.adminNotificationChannelId || null;
     }
 
     // Command definitions
