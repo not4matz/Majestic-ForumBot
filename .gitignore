@@ -1,0 +1,8 @@
+node_modules/
+config.json
+telegram_user_mappings.json
+pending_requests.json
+forumbot.db
+*.db
+stats.json
+user_preferences.json
