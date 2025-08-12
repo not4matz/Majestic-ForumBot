@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const inquirer = require('inquirer');
+// Inquirer v9 is ESM-only. Using `.default` ensures we access the
+// actual inquirer module with the `prompt` method when importing via
+// CommonJS `require`.
+const inquirer = require('inquirer').default;
 
 const configPath = path.join(__dirname, 'config.json');
 
